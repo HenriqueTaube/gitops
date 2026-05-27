@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pc-on
+  namespace: arduino
+spec:
+  template:
+    spec:
+      containers:
+        - name: pc-on
+          volumeMounts:
+            - name: ttyusb0
+              mountPath: /dev/ttyUSB0
+      volumes:
+        - name: ttyusb0
+          hostPath:
+            path: /dev/ttyUSB0
+            type: CharDevice

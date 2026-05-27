@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wg-easy
+  namespace: wireguard
+spec:
+  template:
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: homelab.role/wireguard
+                    operator: In
+                    values:
+                      - "true"
+      containers:
+        - name: wg-easy
+          env:
+            - name: INIT_HOST
+              value: "192.168.1.85"
+            - name: INIT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: wireguard-secrets
+                  key: INIT_USERNAME
+            - name: INIT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wireguard-secrets
+                  key: INIT_PASSWORD

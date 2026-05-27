@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: loki-rwx
+  namespace: loki
+spec:
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 20Gi

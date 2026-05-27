@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orcamentos-api
+  namespace: orcamentos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orcamentos-api
+  template:
+    metadata:
+      labels:
+        app: orcamentos-api
+    spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: orcamentos-api
+          image: orcamentos-api:latest
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - name: orcamentos-data
+              mountPath: /data/history
+      volumes:
+        - name: orcamentos-data
+          persistentVolumeClaim:
+            claimName: orcamentos-data

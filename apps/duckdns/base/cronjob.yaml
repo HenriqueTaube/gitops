@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: duckdns-updater
+  namespace: duckdns
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: duckdns
+              image: curlimages/curl:8.16.0
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: DUCKDNS_DOMAIN
+                  valueFrom:
+                    secretKeyRef:
+                      name: duckdns-secrets
+                      key: DUCKDNS_DOMAIN
+                - name: DUCKDNS_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: duckdns-secrets
+                      key: DUCKDNS_TOKEN
+              command:
+                - sh
+                - -c
+                - >
+                  curl -fsS "https://www.duckdns.org/update?domains=${DUCKDNS_DOMAIN}&token=${DUCKDNS_TOKEN}&ip="
+

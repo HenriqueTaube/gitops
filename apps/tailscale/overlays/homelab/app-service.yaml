@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: agente-ingles-ts
+  namespace: agente-ingles
+  annotations:
+    tailscale.com/proxy-class: worker-prox
+spec:
+  type: LoadBalancer
+  loadBalancerClass: tailscale
+  selector:
+    app: agente-ingles
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+      protocol: TCP

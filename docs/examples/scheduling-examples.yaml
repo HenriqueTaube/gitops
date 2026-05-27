@@ -1,0 +1,213 @@
+## ------------------------------------------------------------
+## EXEMPLOS CURTOS DE SCHEDULING / PLACEMENT
+## ------------------------------------------------------------
+## Este arquivo mostra formas comuns de influenciar onde o pod roda.
+## Mantido curto de proposito.
+## ------------------------------------------------------------
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-node-selector
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: example-node-selector
+  template:
+    metadata:
+      labels:
+        app: example-node-selector
+    spec:
+      ## nodeSelector:
+      ## forma mais simples
+      ## exigencia dura
+      nodeSelector:
+        kubernetes.io/hostname: worker-prox
+      containers:
+        - name: app
+          image: nginx:1.27
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-node-affinity-soft
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: example-node-affinity-soft
+  template:
+    metadata:
+      labels:
+        app: example-node-affinity-soft
+    spec:
+      ## nodeAffinity preferred:
+      ## preferencia, nao obrigacao
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - worker-prox
+      containers:
+        - name: app
+          image: nginx:1.27
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-node-affinity-hard
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: example-node-affinity-hard
+  template:
+    metadata:
+      labels:
+        app: example-node-affinity-hard
+    spec:
+      ## nodeAffinity required:
+      ## obrigacao dura
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - worker-prox
+                      - worker-rasp
+      containers:
+        - name: app
+          image: nginx:1.27
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-pod-anti-affinity
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: example-pod-anti-affinity
+  template:
+    metadata:
+      labels:
+        app: example-pod-anti-affinity
+    spec:
+      ## podAntiAffinity:
+      ## tenta espalhar replicas em nodes diferentes
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    app: example-pod-anti-affinity
+      containers:
+        - name: app
+          image: nginx:1.27
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-topology-spread
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: example-topology-spread
+  template:
+    metadata:
+      labels:
+        app: example-topology-spread
+    spec:
+      ## topologySpreadConstraints:
+      ## distribui replicas de forma mais uniforme
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: example-topology-spread
+      containers:
+        - name: app
+          image: nginx:1.27
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-tolerations
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: example-tolerations
+  template:
+    metadata:
+      labels:
+        app: example-tolerations
+    spec:
+      ## tolerations:
+      ## permite rodar em nodes com taints especificos
+      tolerations:
+        - key: dedicated
+          operator: Equal
+          value: storage
+          effect: NoSchedule
+      containers:
+        - name: app
+          image: nginx:1.27
+
+---
+## Resumo rapido:
+##
+## nodeSelector:
+## - simples
+## - fixo
+##
+## nodeAffinity preferred:
+## - preferencia
+## - mais flexivel
+##
+## nodeAffinity required:
+## - obrigacao
+## - mais expressivo que nodeSelector
+##
+## podAntiAffinity:
+## - ajuda no HA
+## - evita replicas no mesmo node
+##
+## topologySpreadConstraints:
+## - espalhamento moderno
+## - muito bom para replicas
+##
+## tolerations:
+## - libera o pod para nodes taintados
+## - normalmente usado junto com taints

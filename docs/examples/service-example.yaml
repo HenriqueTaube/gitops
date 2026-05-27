@@ -1,0 +1,196 @@
+## -------------------------------------------------------------------
+## EXEMPLOS COMPLETOS DE SERVICE
+## -------------------------------------------------------------------
+## Este arquivo mostra os tipos mais comuns de Service no Kubernetes.
+## Mantido como referencia pratica com comentarios curtos.
+## -------------------------------------------------------------------
+
+apiVersion: v1
+## apiVersion: versao da API do Service.
+
+kind: Service
+## kind: tipo do recurso.
+
+metadata:
+## metadata: informacoes do objeto.
+  name: example-clusterip
+  ## name: nome do Service.
+  namespace: default
+  ## namespace: namespace onde o Service sera criado.
+  labels:
+    app: example-app
+    ## labels: labels do Service.
+
+spec:
+## spec: especificacao do Service.
+  type: ClusterIP
+  ## type: ClusterIP
+  ## - acessivel somente dentro do cluster
+  ## - tipo padrao
+
+  selector:
+  ## selector: o Service manda trafego para pods com estas labels.
+    app: example-app
+
+  ports:
+  ## ports: portas expostas pelo Service.
+    - name: http
+      ## name: nome da porta.
+      port: 80
+      ## port: porta do Service.
+      targetPort: 8080
+      ## targetPort: porta do container/pod.
+      protocol: TCP
+      ## protocol: protocolo.
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: example-nodeport
+  namespace: default
+spec:
+  type: NodePort
+  ## type: NodePort
+  ## - expõe o Service em todos os nodes
+  ## - acessa por NODE_IP:NODE_PORT
+
+  selector:
+    app: example-app
+
+  ports:
+    - name: http
+      port: 80
+      ## port: porta interna do Service.
+      targetPort: 8080
+      ## targetPort: porta do pod.
+      nodePort: 30080
+      ## nodePort: porta fixa aberta nos nodes.
+      protocol: TCP
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: example-loadbalancer
+  namespace: default
+spec:
+  type: LoadBalancer
+  ## type: LoadBalancer
+  ## - expõe o Service com IP proprio
+  ## - em homelab costuma depender de MetalLB
+
+  loadBalancerIP: 192.168.1.160
+  ## loadBalancerIP: IP desejado do Service na LAN.
+  ## so funciona se o controller aceitar esse IP.
+
+  selector:
+    app: example-app
+
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      protocol: TCP
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: example-headless
+  namespace: default
+spec:
+  clusterIP: None
+  ## clusterIP: None
+  ## - transforma em headless service
+  ## - comum com StatefulSet
+  ## - nao cria IP virtual unico
+
+  selector:
+    app: example-app
+
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      protocol: TCP
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: example-with-session-affinity
+  namespace: default
+spec:
+  type: ClusterIP
+
+  selector:
+    app: example-app
+
+  sessionAffinity: ClientIP
+  ## sessionAffinity: ClientIP
+  ## - tenta mandar o mesmo cliente para o mesmo backend
+  ## - util em alguns casos de sessao
+
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      protocol: TCP
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: example-multi-port
+  namespace: default
+spec:
+  type: ClusterIP
+
+  selector:
+    app: example-app
+
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      protocol: TCP
+
+    - name: metrics
+      port: 9090
+      targetPort: 9090
+      protocol: TCP
+      ## exemplo de Service com mais de uma porta.
+
+---
+## -------------------------------------------------------------------
+## RESUMO RAPIDO
+## -------------------------------------------------------------------
+##
+## ClusterIP:
+## - trafego interno do cluster
+## - padrao
+##
+## NodePort:
+## - abre porta em todos os nodes
+## - acessa por IP do node + porta alta
+##
+## LoadBalancer:
+## - IP proprio
+## - ideal para homelab com MetalLB
+##
+## Headless:
+## - clusterIP: None
+## - comum para StatefulSet e descoberta direta
+##
+## SessionAffinity:
+## - tenta manter cliente no mesmo backend
+##
+## Multi-port:
+## - um Service com varias portas nomeadas
+## -------------------------------------------------------------------

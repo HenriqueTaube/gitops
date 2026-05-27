@@ -1,0 +1,11 @@
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: longhorn
+provisioning:
+  diskSelector:
+    match: "'/dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi2' in disk.symlinks"
+  minSize: 400GiB
+  grow: true
+filesystem:
+  type: xfs
+

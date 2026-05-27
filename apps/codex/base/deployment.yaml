@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codex-api
+  namespace: codex
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: codex-api
+  template:
+    metadata:
+      labels:
+        app: codex-api
+    spec:
+      containers:
+        - name: codex
+          image: codex:latest
+          ports:
+            - containerPort: 8000
+              name: http

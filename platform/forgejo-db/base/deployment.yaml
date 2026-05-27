@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forgejo-mysql
+  namespace: forgejo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: forgejo-mysql
+  template:
+    metadata:
+      labels:
+        app: forgejo-mysql
+    spec:
+      #nodeSelector:
+        #kubernetes.io/hostname: worker-prox
+      containers:
+        - name: mysql
+          image: mariadb:11.6
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: MARIADB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-mysql
+                  key: mysql-root-password
+            - name: MARIADB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-mysql
+                  key: mysql-database
+            - name: MARIADB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-mysql
+                  key: mysql-user
+            - name: MARIADB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-mysql
+                  key: mysql-password
+          ports:
+            - name: mysql
+              containerPort: 3306
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: forgejo-mysql-longhorn

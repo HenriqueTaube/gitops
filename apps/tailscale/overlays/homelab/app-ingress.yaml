@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: agente-ingles
+  namespace: agente-ingles
+  annotations:
+    tailscale.com/proxy-class: worker-prox
+spec:
+  ingressClassName: tailscale
+  tls:
+    - hosts:
+        - agente-ingles
+  rules:
+    - host: agente-ingles
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: agente-ingles
+                port:
+                  number: 3000
