@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: toolbox-maintenance-prox
+  namespace: maintenance
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: worker-prox
+  containers:
+    - name: toolbox
+      image: 192.168.1.191:3000/henrique/toolbox:amd64
+      imagePullPolicy: Always

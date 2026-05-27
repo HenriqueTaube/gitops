@@ -1,0 +1,289 @@
+## -------------------------------------------------------------------
+## EXEMPLO COMPLETO DE DEPLOYMENT
+## -------------------------------------------------------------------
+## Este arquivo e um guia de referencia.
+
+apiVersion: apps/v1
+## apiVersion: versao da API do recurso Deployment.
+
+kind: Deployment
+## kind: tipo do recurso Kubernetes.
+
+metadata:
+## metadata: informacoes do objeto.
+
+  name: example-app
+  ## name: nome do Deployment.
+
+  namespace: default
+  ## namespace: namespace onde o Deployment sera criado.
+
+  labels:
+  ## labels: rotulos do proprio Deployment.
+    app: example-app
+    ## app: label principal do workload.
+    tier: web
+    ## tier: exemplo de camada da aplicacao.
+
+spec:
+## spec: especificacao principal do Deployment.
+
+  replicas: 1
+  ## replicas: quantidade desejada de pods.
+  ## replicas: 1 = padrao para app stateful com PVC ReadWriteOnce.
+  ## replicas: 2+ = mais comum para app stateless.
+
+  revisionHistoryLimit: 3
+  ## revisionHistoryLimit: quantas revisoes antigas o Deployment guarda.
+
+  progressDeadlineSeconds: 600
+  ## progressDeadlineSeconds: tempo maximo para rollout antes de marcar falha.
+
+  strategy:
+  ## strategy: define como o Deployment atualiza os pods.
+
+    type: Recreate
+    ## type: Recreate ou RollingUpdate.
+    ## Recreate:
+    ## - mata os pods antigos primeiro
+    ## - depois sobe os novos
+    ## - bom para app com 1 PVC ReadWriteOnce
+    ## RollingUpdate:
+    ## - troca pods aos poucos
+    ## - melhor para app stateless ou multi-replica
+
+    ## rollingUpdate:
+    ## rollingUpdate: usado apenas quando type = RollingUpdate.
+    ##   maxUnavailable: 1
+    ##   ## maxUnavailable: quantos pods podem ficar indisponiveis durante update.
+    ##   maxSurge: 1
+    ##   ## maxSurge: quantos pods extras podem ser criados durante update.
+
+  selector:
+  ## selector: labels que o Deployment usa para encontrar os pods dele.
+    matchLabels:
+      app: example-app
+      ## matchLabels: deve bater com as labels do pod template.
+
+  template:
+  ## template: modelo do pod que o Deployment cria.
+
+    metadata:
+    ## metadata do pod.
+      labels:
+        app: example-app
+        ## label principal do pod.
+        tier: web
+        ## label extra para filtros, policies e services.
+
+      annotations:
+      ## annotations: metadados extras do pod.
+        example.com/reload-on-config-change: "true"
+        ## exemplo apenas ilustrativo.
+
+    spec:
+    ## spec do pod.
+
+      serviceAccountName: default
+      ## serviceAccountName: conta usada pelo pod para falar com a API do cluster.
+
+      terminationGracePeriodSeconds: 30
+      ## terminationGracePeriodSeconds: tempo para encerramento limpo antes de kill.
+
+      restartPolicy: Always
+      ## restartPolicy: em Deployment normalmente e Always.
+
+      dnsPolicy: ClusterFirst
+      ## dnsPolicy: politica de DNS do pod.
+
+      ## nodeSelector:
+      ## nodeSelector: fixa o workload em nodes com labels especificos.
+      ##   kubernetes.io/hostname: worker-prox
+      ## use somente quando realmente quiser prender o pod.
+
+      tolerations:
+      ## tolerations: permitem que o pod fique ou seja agendado em nodes taintados.
+        - key: node.kubernetes.io/not-ready
+          ## key: taint de node not-ready.
+          operator: Exists
+          ## operator: Exists significa que basta a key existir.
+          effect: NoExecute
+          ## effect: NoExecute remove o pod do node quando a tolerancia expira.
+          tolerationSeconds: 30
+          ## tolerationSeconds: apos 30s em node not-ready, o pod pode ser evacuado.
+
+        - key: node.kubernetes.io/unreachable
+          ## key: taint de node unreachable.
+          operator: Exists
+          effect: NoExecute
+          tolerationSeconds: 30
+          ## bom para failover mais rapido quando um worker morre.
+
+      affinity:
+      ## affinity: regras ou preferencias de agendamento.
+
+        podAntiAffinity:
+        ## podAntiAffinity: evita colocar replicas iguais no mesmo node.
+
+          preferredDuringSchedulingIgnoredDuringExecution:
+          ## preferred: preferencia, nao obrigacao.
+            - weight: 100
+              ## weight: peso da preferencia.
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                ## topologyKey: espalha por hostname = node.
+                labelSelector:
+                  matchLabels:
+                    app: example-app
+                    ## tenta evitar pods iguais no mesmo node.
+
+        ## nodeAffinity:
+        ## nodeAffinity: preferencia ou exigencia por labels de node.
+        ##   preferredDuringSchedulingIgnoredDuringExecution:
+        ##     - weight: 50
+        ##       preference:
+        ##         matchExpressions:
+        ##           - key: kubernetes.io/hostname
+        ##             operator: In
+        ##             values:
+        ##               - worker-prox
+        ##               - worker-rasp
+
+      topologySpreadConstraints:
+      ## topologySpreadConstraints: outra forma moderna de espalhar replicas.
+        - maxSkew: 1
+          ## maxSkew: diferenca maxima de pods entre nodes.
+          topologyKey: kubernetes.io/hostname
+          ## espalha entre nodes.
+          whenUnsatisfiable: ScheduleAnyway
+          ## ScheduleAnyway = preferencia suave.
+          labelSelector:
+            matchLabels:
+              app: example-app
+
+      securityContext:
+      ## securityContext do pod.
+        fsGroup: 1000
+        ## fsGroup: grupo aplicado em volumes para permissao de escrita.
+
+      initContainers:
+      ## initContainers: rodam antes dos containers principais.
+        - name: init-permissions
+          image: busybox:1.36
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - mkdir -p /data && chown -R 1000:1000 /data
+          volumeMounts:
+            - name: app-data
+              mountPath: /data
+
+      containers:
+      ## containers: lista de containers principais do pod.
+        - name: app
+          ## name: nome do container.
+
+          image: nginx:1.27
+          ## image: imagem do container.
+
+          imagePullPolicy: IfNotPresent
+          ## imagePullPolicy:
+          ## - IfNotPresent: usa cache local se existir
+          ## - Always: sempre tenta baixar
+          ## - Never: nunca baixa
+
+          ports:
+          ## ports: portas expostas pelo container.
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+
+          env:
+          ## env: variaveis de ambiente literais.
+            - name: APP_ENV
+              value: production
+
+          envFrom:
+          ## envFrom: injeta variaveis vindas de Secret ou ConfigMap.
+            - secretRef:
+                name: example-app-secret
+            - configMapRef:
+                name: example-app-config
+
+          resources:
+          ## resources: pedidos e limites para scheduler e runtime.
+            requests:
+              cpu: 100m
+              ## requests.cpu: minimo reservado para o pod.
+              memory: 128Mi
+              ## requests.memory: memoria minima esperada.
+            limits:
+              cpu: 500m
+              ## limits.cpu: teto de CPU.
+              memory: 512Mi
+              ## limits.memory: teto de memoria.
+
+          volumeMounts:
+          ## volumeMounts: monta volumes dentro do container.
+            - name: app-data
+              mountPath: /data
+              ## mountPath: caminho onde o volume aparece dentro do container.
+
+            - name: app-config
+              mountPath: /etc/example/config.yaml
+              subPath: config.yaml
+              ## subPath: monta somente um arquivo do volume.
+
+          readinessProbe:
+          ## readinessProbe: diz quando o pod pode receber trafego.
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          livenessProbe:
+          ## livenessProbe: reinicia o container se ele travar.
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          startupProbe:
+          ## startupProbe: usada para apps que demoram a subir.
+            httpGet:
+              path: /health
+              port: http
+            failureThreshold: 30
+            periodSeconds: 5
+
+          lifecycle:
+          ## lifecycle: hooks antes de subir ou terminar.
+            preStop:
+              exec:
+                command:
+                  - sh
+                  - -c
+                  - sleep 5
+                  ## preStop: pequeno delay para drenagem de trafego antes de matar.
+
+      volumes:
+      ## volumes: define de onde vem os mounts.
+        - name: app-data
+          ## app-data: volume persistente para dados.
+          persistentVolumeClaim:
+            claimName: example-app-pvc
+            ## claimName: nome do PVC que o pod vai usar.
+
+        - name: app-config
+          ## app-config: volume vindo de ConfigMap.
+          configMap:
+            name: example-app-config
+
+---

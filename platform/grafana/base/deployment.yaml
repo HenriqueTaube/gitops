@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: grafana
+  labels:
+    app: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      #nodeSelector:
+        #kubernetes.io/hostname: worker-prox
+      tolerations:
+       - key: node.kubernetes.io/not-ready
+         operator: Exists
+         effect: NoExecute
+         tolerationSeconds: 30
+       - key: node.kubernetes.io/unreachable
+         operator: Exists
+         effect: NoExecute
+         tolerationSeconds: 30
+      securityContext:
+        fsGroup: 472
+        supplementalGroups:
+          - 0
+      containers:
+        - name: grafana
+          image: grafana/grafana:12.4.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http-grafana
+              containerPort: 3000
+              protocol: TCP
+          env:
+            - name: GF_DATABASE_TYPE
+              value: postgres
+            - name: GF_DATABASE_HOST
+              value: pg-grafana-longhorn-rw.grafana-longhorn-db.svc.cluster.local:5432
+            - name: GF_DATABASE_NAME
+              value: grafana
+            - name: GF_DATABASE_SSL_MODE
+              value: disable
+            - name: GF_DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-db-secret
+                  key: GF_DATABASE_USER
+            - name: GF_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-db-secret
+                  key: GF_DATABASE_PASSWORD
+          readinessProbe:
+            httpGet:
+              path: /robots.txt
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 300m
+              memory: 512Mi

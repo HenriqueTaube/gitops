@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: forgejo-mysql-longhorn
+  namespace: forgejo
+spec:
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 10Gi

@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pc-on
+  namespace: arduino
+spec:
+  template:
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: worker-prox
+      restartPolicy: Never
+      containers:
+        - name: pc-on
+          securityContext:
+            privileged: true
+          image: alpine:3.20
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - exec 3<>/dev/ttyUSB0; stty -F /dev/ttyUSB0 9600 raw -echo -hupcl; sleep 2; printf "POWER\n" >&3; sleep 1; exec 3>&-; exec 3<&-

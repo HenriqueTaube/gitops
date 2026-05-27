@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wireguard
+  namespace: wireguard
+spec:
+  template:
+    spec:
+      containers:
+        - name: wireguard
+          image: 192.168.1.191:3000/henrique/wireguard:multi
+          imagePullPolicy: Always

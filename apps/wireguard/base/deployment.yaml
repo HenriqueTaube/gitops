@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wireguard
+  namespace: wireguard
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: wireguard
+  template:
+    metadata:
+      labels:
+        app: wireguard
+    spec:
+      tolerations:
+        - key: node.kubernetes.io/not-ready
+          operator: Exists
+          effect: NoExecute
+          tolerationSeconds: 30
+        - key: node.kubernetes.io/unreachable
+          operator: Exists
+          effect: NoExecute
+          tolerationSeconds: 30
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: wireguard
+          image: wireguard:latest
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+          env:
+            - name: WG_CONFIG
+              value: /etc/wireguard/wg0.conf
+            - name: WG_INTERFACE
+              value: wg0
+          ports:
+            - name: wireguard
+              containerPort: 51820
+              hostPort: 51820
+              protocol: UDP
+          volumeMounts:
+            - name: wireguard-data
+              mountPath: /etc/wireguard
+      volumes:
+        - name: wireguard-data
+          persistentVolumeClaim:
+            claimName: wireguard-data

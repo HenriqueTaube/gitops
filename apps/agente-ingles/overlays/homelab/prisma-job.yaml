@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: agente-ingles-prisma
+  namespace: agente-ingles
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: worker-prox
+      restartPolicy: Never
+      containers:
+        - name: prisma
+          image: 192.168.1.191:3000/henrique/agente-ingles:migrator
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: agente-ingles-app
+          command:
+            - npx
+            - prisma
+            - db
+            - push

@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+  - operator-secret.yaml
+  - proxyclass-worker-prox.yaml
+  - app-service.yaml
+  - app-ingress.yaml
