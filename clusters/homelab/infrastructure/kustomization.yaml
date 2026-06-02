@@ -4,4 +4,3 @@ kind: Kustomization
 resources:
   - ../../../infrastructure/longhorn/overlays/homelab
   - ../../../infrastructure/metallb/overlays/homelab
-  - ../../../infrastructure/traefik/overlays/homelab
