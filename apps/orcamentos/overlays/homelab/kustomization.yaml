@@ -6,6 +6,7 @@ resources:
   - secret.yaml
 
 patches:
-  - path: patch-deployment.yaml
-  - path: patch-pvc.yaml
-  - path: patch-service.yaml
+  - path: patch-deployment-proposta-taube.yaml
+  - path: patch-deployment-proposta-api.yaml
+  - path: patch-service-proposta-taube.yaml
+  - path: patch-service-proposta-api.yaml

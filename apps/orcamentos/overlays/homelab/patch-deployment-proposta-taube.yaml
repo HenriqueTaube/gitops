@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: site-orcamentos
+  namespace: site-orcamentos
+spec:
+  template:
+    spec:
+      #nodeSelector:
+      #kubernetes.io/hostname: worker
+      containers:
+        - name: site-orcamentos
+          image: 192.168.1.191:3000/henrique/proposta-taube:latest
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL

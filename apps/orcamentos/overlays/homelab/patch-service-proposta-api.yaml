@@ -1,12 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: orcamentos-api
-  namespace: orcamentos
+  name: proposta-api
+  namespace: site-orcamentos
 spec:
-  type: NodePort
+  type: ClusterIP
+  selector:
+    app: proposta-api
   ports:
     - name: http
       port: 8000
       targetPort: 8000
-      nodePort: 30081

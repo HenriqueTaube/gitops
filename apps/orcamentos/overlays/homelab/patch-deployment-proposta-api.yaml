@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proposta-api
+  namespace: site-orcamentos
+spec:
+  template:
+    spec:
+      containers:
+        - name: proposta-api
+          image: 192.168.1.191:3000/henrique/proposta-api:latest
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 1000
+          env:
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: site-orcamentos
+                  key: ANTHROPIC_API_KEY
