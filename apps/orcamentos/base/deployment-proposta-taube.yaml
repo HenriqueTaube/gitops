@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: site-orcamentos
+  namespace: site-orcamentos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: site-orcamentos
+  template:
+    metadata:
+      labels:
+        app: site-orcamentos
+    spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: site-orcamentos
+          image: proposta-taube:lastest
+          ports:
+            - containerPort: 80

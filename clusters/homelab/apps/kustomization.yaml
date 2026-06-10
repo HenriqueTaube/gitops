@@ -6,3 +6,4 @@ resources:
   - ../../../apps/cloudflare/overlays/homelab
   - ../../../apps/duckdns/overlays/homelab
   - ../../../apps/forgejo/overlays/homelab
+  - ../../../apps/orcamentos/overlays/homelab/

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proposta-api
+  namespace: site-orcamentos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: proposta-api
+  template:
+    metadata:
+      labels:
+        app: proposta-api
+    spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: proposta-api
+          image: proposta-api:latest
+          ports:
+            - containerPort: 8000
