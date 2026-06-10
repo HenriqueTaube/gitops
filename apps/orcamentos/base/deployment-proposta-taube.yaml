@@ -20,4 +20,4 @@ spec:
         - name: site-orcamentos
           image: proposta-taube:lastest
           ports:
-            - containerPort: 80
+            - containerPort: 8080
