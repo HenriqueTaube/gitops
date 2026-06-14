@@ -29,7 +29,7 @@ The AMD64 machine also runs additional workloads outside the Kubernetes cluster 
 
 - **Nextcloud** — self-hosted file storage for personal and company use
 - **Bitcoin Node** (Knots) — full bitcoin node
-- **Networking VM** — Pi-hole (DNS/DHCP), WireGuard, Unbound
+- **Networking VM** — Pi-hole (DNS/DHCP) and Unbound
 
 ---
 
@@ -44,11 +44,11 @@ The AMD64 machine also runs additional workloads outside the Kubernetes cluster 
 │   │      Proxmox Hypervisor      │   │       8GB RAM      │  │
 │   │                              │   │                    │  │
 │   │  ┌─────────────┐ ┌────────┐  │   │  ┌──────────────┐  │  │
-│   │  │ controlplane │ │ worker │  │   │  │    worker    │  │  │
+│   │  │ controlplane│ │ worker │  │   │  │    worker    │  │  │
 │   │  └─────────────┘ └────────┘  │   │  └──────────────┘  │  │
 │   │                              │   └────────────────────┘  │
 │   │  + Nextcloud  + Bitcoin Node │                           │
-│   │  + Pi-hole   + WireGuard     │                           │
+│   │  + Pi-hole                   │                           │
 │   └──────────────────────────────┘                           │
 └──────────────────────────────────────────────────────────────┘
                               │
