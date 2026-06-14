@@ -31,8 +31,8 @@ Go one by one. User answers in their own words, Claude helps polish.
 ### Status
 - [x] Talos Linux — answered by user
 - [x] Proxmox — answered by user
-- [ ] Flux CD ← **STOPPED HERE** — ask: "Why Flux and not ArgoCD?"
-- [ ] Kustomize
+- [x] Flux CD — answered by user
+- [x] Kustomize — answered by user
 - [ ] SOPS
 - [ ] MetalLB
 - [ ] Traefik

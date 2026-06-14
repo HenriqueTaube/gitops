@@ -77,9 +77,9 @@ The AMD64 machine also runs additional workloads outside the Kubernetes cluster 
 |---|---|---|
 | [Talos Linux](https://www.talos.dev/) | Kubernetes OS | Immutable, API-driven OS designed exclusively for Kubernetes. No SSH, no shell — everything is declared in YAML. Chosen because it is production-grade and forces a deep understanding of how Kubernetes nodes actually work. |
 | [Proxmox](https://www.proxmox.com/) | Hypervisor | Allows running multiple isolated VMs on a single physical machine. Introduced me to VM management, NFS storage, disk provisioning, and SSH. |
-| [Flux CD](https://fluxcd.io/) | GitOps operator | Watches this repository and reconciles changes to the cluster automatically. Chosen for its native Kustomize support and lightweight, controller-based architecture. |
-| [Kustomize](https://kustomize.io/) | Config management | Manages environment-specific configuration through `base/` and `overlays/` without templating. Keeps manifests clean and reusable. |
-| [SOPS + age](https://github.com/getsops/sops) | Secrets management | Encrypts secrets directly in Git using age keys. Secrets are version-controlled safely without a separate secrets store. |
+| [Flux CD](https://fluxcd.io/) | GitOps operator | Purely CLI and config-file driven — no UI, no extra layer to manage. Everything is declared in YAML and reconciled from Git, which fits naturally into the rest of the stack. Flux is also the most widely adopted GitOps tool in the industry. |
+| [Kustomize](https://kustomize.io/) | Config management | Works with pure YAML — no templating language to learn. Base manifests are written directly and overlays handle environment-specific patches, keeping everything readable and straightforward. |
+| [SOPS + age](https://github.com/getsops/sops) | Secrets management | Native Flux CD support makes integration straightforward. Only the secret values are encrypted — the YAML structure stays readable in Git. age keys were chosen for their simplicity over PGP. |
 | [MetalLB](https://metallb.universe.tf/) | Load balancer | Provides `LoadBalancer` type services on bare-metal clusters where no cloud provider load balancer exists. |
 | [Traefik](https://traefik.io/) | Ingress controller | Routes external traffic into the cluster. Chosen for its simple Helm-based installation and good integration with Kubernetes ingress resources. |
 | [Longhorn](https://longhorn.io/) | Persistent storage | Distributed block storage for Kubernetes. Provides persistent volumes with replication across nodes. |
