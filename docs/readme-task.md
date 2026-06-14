@@ -33,8 +33,9 @@ Go one by one. User answers in their own words, Claude helps polish.
 - [x] Proxmox — answered by user
 - [x] Flux CD — answered by user
 - [x] Kustomize — answered by user
-- [ ] SOPS
-- [ ] MetalLB
+- [x] SOPS — answered by user
+- [x] Cilium — answered by user (added to README)
+- [x] MetalLB — answered by user
 - [ ] Traefik
 - [ ] Longhorn
 - [ ] CloudNativePG

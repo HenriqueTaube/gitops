@@ -7,6 +7,7 @@
 ![Talos](https://img.shields.io/badge/Talos_Linux-FF7300?logo=linux&logoColor=white)
 ![SOPS](https://img.shields.io/badge/SOPS-000000?logo=mozilla&logoColor=white)
 ![Kustomize](https://img.shields.io/badge/Kustomize-326CE5?logo=kubernetes&logoColor=white)
+![Cilium](https://img.shields.io/badge/Cilium-F8C517?logo=cilium&logoColor=black)
 
 ---
 
@@ -80,7 +81,8 @@ The AMD64 machine also runs additional workloads outside the Kubernetes cluster 
 | [Flux CD](https://fluxcd.io/) | GitOps operator | Purely CLI and config-file driven — no UI, no extra layer to manage. Everything is declared in YAML and reconciled from Git, which fits naturally into the rest of the stack. Flux is also the most widely adopted GitOps tool in the industry. |
 | [Kustomize](https://kustomize.io/) | Config management | Works with pure YAML — no templating language to learn. Base manifests are written directly and overlays handle environment-specific patches, keeping everything readable and straightforward. |
 | [SOPS + age](https://github.com/getsops/sops) | Secrets management | Native Flux CD support makes integration straightforward. Only the secret values are encrypted — the YAML structure stays readable in Git. age keys were chosen for their simplicity over PGP. |
-| [MetalLB](https://metallb.universe.tf/) | Load balancer | Provides `LoadBalancer` type services on bare-metal clusters where no cloud provider load balancer exists. |
+| [Cilium](https://cilium.io/) | CNI | Started with Flannel but had compatibility problems with the Raspberry Pi nodes. Migrated to Cilium, which handled the mixed AMD64/ARM64 cluster without issues. Also the most widely adopted CNI in the industry. |
+| [MetalLB](https://metallb.universe.tf/) | Load balancer | The cluster uses Cilium as the CNI, which includes its own load balancer (CiliumLB). MetalLB was chosen anyway to keep the load balancer as a dedicated, separate component — easier to reason about and troubleshoot independently. Simple Helm installation, almost plug and play for bare-metal. |
 | [Traefik](https://traefik.io/) | Ingress controller | Routes external traffic into the cluster. Chosen for its simple Helm-based installation and good integration with Kubernetes ingress resources. |
 | [Longhorn](https://longhorn.io/) | Persistent storage | Distributed block storage for Kubernetes. Provides persistent volumes with replication across nodes. |
 | [CloudNativePG](https://cloudnative-pg.io/) | PostgreSQL operator | Manages PostgreSQL clusters as Kubernetes-native resources. More reliable than running a plain postgres pod. |
