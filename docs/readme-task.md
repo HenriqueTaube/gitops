@@ -36,8 +36,8 @@ Go one by one. User answers in their own words, Claude helps polish.
 - [x] SOPS — answered by user
 - [x] Cilium — answered by user (added to README)
 - [x] MetalLB — answered by user
-- [ ] Traefik
-- [ ] Longhorn
+- [x] Traefik — removed, replaced with Cloudflare Tunnel (answered by user)
+- [x] Longhorn — answered by user
 - [ ] CloudNativePG
 - [ ] Grafana + Loki
 - [ ] Tailscale / WireGuard
