@@ -152,6 +152,20 @@ Flux Kustomizations use `dependsOn` to enforce reconciliation order. Apps only d
 **Mixed architecture cluster**
 The cluster runs on both AMD64 (Proxmox VMs) and ARM64 (Raspberry Pi 5). All workloads use multi-arch container images to run on both node types.
 
+**Dedicated load balancer over CNI built-in**
+Cilium ships with its own load balancer (CiliumLB), but MetalLB was chosen as a separate, dedicated component. Keeping the load balancer independent makes it easier to reason about, troubleshoot, and replace without touching the CNI layer.
+
+**CNI chosen through real troubleshooting**
+The cluster started with Flannel as the CNI, which worked on AMD64 but caused compatibility issues on the Raspberry Pi 5 worker node. After diagnosing the problem, Cilium was chosen as a replacement — it handled the mixed AMD64/ARM64 cluster without issues and is the most widely adopted CNI in production environments.
+
+**No open ports — two strategies for external access**
+External access is handled without opening ports on the home network, using two different approaches depending on the use case:
+- **Cloudflare Tunnel** — for public-facing apps accessible via a domain (e.g. [agente.taubekube.com](https://agente.taubekube.com)). Cloudflare acts as a secure proxy with automatic HTTPS.
+- **WireGuard VPN** — for trusted company partners who need private access to internal applications and Nextcloud. VPN access is highly secure and grants network-level access only to authorized peers via public/private key authentication.
+
+**Dynamic DNS as Kubernetes-native infrastructure**
+The home IP changes on every modem reboot (dynamic IP, no CGNAT). Rather than a script running on a VM, a Kubernetes CronJob updates DuckDNS every 5 minutes with the current public IP. This keeps the WireGuard endpoint always reachable and is managed entirely through GitOps like everything else in the cluster.
+
 ---
 
 ## Deployed Services
