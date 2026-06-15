@@ -88,8 +88,8 @@ The AMD64 machine also runs additional workloads outside the Kubernetes cluster 
 | [CloudNativePG](https://cloudnative-pg.io/) | PostgreSQL operator | Used to run the PostgreSQL database for Grafana. Manages PostgreSQL as a Kubernetes-native resource — the database runs in a dedicated pod with its own persistent volume. If the pod is deleted, Kubernetes recreates it automatically with the same data. Configuration is declared in YAML and immutable, which fits the GitOps model. |
 | [Grafana + Loki](https://grafana.com/) | Observability | Started running both outside Kubernetes in an Ubuntu Server VM to monitor Proxmox. Migrated into the cluster to keep all workloads managed by GitOps. Grafana is one of the main platform services — dashboard configurations are declared as code in the repository. Loki handles log aggregation for cluster and application logs. |
 | [WireGuard](https://www.wireguard.com/) | VPN | Used for remote access to the home network from outside — both personal use and for the company to access Nextcloud and internal apps. Simple, open source, and highly performant. Configuration is based on public/private key pairs, which makes it easy to understand and audit. |
-| [Cloudflare + DuckDNS](https://www.cloudflare.com/) | DNS | Cloudflare for DNS management and DuckDNS for dynamic DNS updates to my home IP. |
-| [Forgejo](https://forgejo.org/) | Git hosting | Self-hosted Git service running inside the cluster. |
+| [DuckDNS](https://www.duckdns.org/) | Dynamic DNS | My ISP provides a real public IP (no CGNAT) but it changes every time the modem reboots. DuckDNS keeps a domain always pointed to the current public IP. A Kubernetes CronJob runs every 5 minutes to update DuckDNS with the latest IP — used as the endpoint for WireGuard so remote clients can always connect regardless of IP changes. |
+| [Forgejo](https://forgejo.org/) | Git hosting | Self-hosted Git service used to back up all personal project repositories and collaborate with friends — sharing private repos, `.env` files, and project assets without depending on a third-party platform. Keeping data under my own control is a core motivation for the homelab. |
 
 ---
 

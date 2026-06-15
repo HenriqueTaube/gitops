@@ -42,8 +42,9 @@ Go one by one. User answers in their own words, Claude helps polish.
 - [x] Grafana + Loki — answered by user
 - [x] Tailscale — removed (not used)
 - [x] WireGuard — answered by user
-- [ ] Cloudflare / DuckDNS
-- [ ] Forgejo
+- [x] Cloudflare — covered by Cloudflare Tunnel entry
+- [x] DuckDNS — answered by user
+- [x] Forgejo — answered by user
 
 ## How to resume
 1. Open this file
