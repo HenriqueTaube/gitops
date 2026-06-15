@@ -195,7 +195,7 @@ High-level steps:
 1. Generate Talos machine configs with `talosctl`
 2. Apply configs to controlplane and worker nodes
 3. Bootstrap the Kubernetes cluster
-4. Install Flux CD into the cluster
+4. Install Flux CD into the cluster with Helm
 5. Add the SOPS age private key as a Kubernetes secret
 6. Flux reconciles this repository and brings up the full stack
 
