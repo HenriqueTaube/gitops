@@ -38,9 +38,10 @@ Go one by one. User answers in their own words, Claude helps polish.
 - [x] MetalLB — answered by user
 - [x] Traefik — removed, replaced with Cloudflare Tunnel (answered by user)
 - [x] Longhorn — answered by user
-- [ ] CloudNativePG
-- [ ] Grafana + Loki
-- [ ] Tailscale / WireGuard
+- [x] CloudNativePG — answered by user
+- [x] Grafana + Loki — answered by user
+- [x] Tailscale — removed (not used)
+- [x] WireGuard — answered by user
 - [ ] Cloudflare / DuckDNS
 - [ ] Forgejo
 

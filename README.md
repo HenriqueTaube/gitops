@@ -64,10 +64,10 @@ The AMD64 machine also runs additional workloads outside the Kubernetes cluster 
        infrastructure      platform          apps
        ─────────────      ────────          ──────
        MetalLB            Grafana           Forgejo
-       Traefik            Loki              Orcamentos
-       Longhorn           CloudNativePG     Tailscale
-                                            WireGuard
+       Longhorn           Loki              Orcamentos
+       Cilium             CloudNativePG     WireGuard
                                             DuckDNS
+                                            Cloudflare Tunnel
 ```
 
 ---
@@ -85,10 +85,9 @@ The AMD64 machine also runs additional workloads outside the Kubernetes cluster 
 | [MetalLB](https://metallb.universe.tf/) | Load balancer | The cluster uses Cilium as the CNI, which includes its own load balancer (CiliumLB). MetalLB was chosen anyway to keep the load balancer as a dedicated, separate component — easier to reason about and troubleshoot independently. Simple Helm installation, almost plug and play for bare-metal. |
 | [Cloudflare Tunnel](https://www.cloudflare.com/products/tunnel/) | External access for Apps| Exposes applications publicly without opening ports on the home network. Creates an outbound connection from the cluster to Cloudflare, making apps accessible at a public domain (e.g. [agente.taubekube.com](https://agente.taubekube.com)) with automatic HTTPS. |
 | [Longhorn](https://longhorn.io/) | Persistent storage | Chosen for its built-in snapshot and backup support, agent-per-node architecture, and NFS export capability used for backups. Volumes are automatically distributed and replicated across nodes. Almost plug and play to install — no complex storage backend required. |
-| [CloudNativePG](https://cloudnative-pg.io/) | PostgreSQL operator | Manages PostgreSQL clusters as Kubernetes-native resources. More reliable than running a plain postgres pod. |
-| [Grafana + Loki](https://grafana.com/) | Observability | Grafana for dashboards, Loki for log aggregation. Provides visibility into cluster and application health. |
-| [Tailscale](https://tailscale.com/) | VPN mesh | Secure remote access to cluster services without exposing ports publicly. |
-| [WireGuard](https://www.wireguard.com/) | VPN | Lightweight VPN for network-level access to homelab resources. |
+| [CloudNativePG](https://cloudnative-pg.io/) | PostgreSQL operator | Used to run the PostgreSQL database for Grafana. Manages PostgreSQL as a Kubernetes-native resource — the database runs in a dedicated pod with its own persistent volume. If the pod is deleted, Kubernetes recreates it automatically with the same data. Configuration is declared in YAML and immutable, which fits the GitOps model. |
+| [Grafana + Loki](https://grafana.com/) | Observability | Started running both outside Kubernetes in an Ubuntu Server VM to monitor Proxmox. Migrated into the cluster to keep all workloads managed by GitOps. Grafana is one of the main platform services — dashboard configurations are declared as code in the repository. Loki handles log aggregation for cluster and application logs. |
+| [WireGuard](https://www.wireguard.com/) | VPN | Used for remote access to the home network from outside — both personal use and for the company to access Nextcloud and internal apps. Simple, open source, and highly performant. Configuration is based on public/private key pairs, which makes it easy to understand and audit. |
 | [Cloudflare + DuckDNS](https://www.cloudflare.com/) | DNS | Cloudflare for DNS management and DuckDNS for dynamic DNS updates to my home IP. |
 | [Forgejo](https://forgejo.org/) | Git hosting | Self-hosted Git service running inside the cluster. |
 
@@ -160,15 +159,13 @@ The cluster runs on both AMD64 (Proxmox VMs) and ARM64 (Raspberry Pi 5). All wor
 | Service | Category | Description |
 |---|---|---|
 | [MetalLB](infrastructure/metallb/) | Infrastructure | Bare-metal load balancer |
-| [Traefik](infrastructure/traefik/) | Infrastructure | Ingress controller |
 | [Longhorn](infrastructure/longhorn/) | Infrastructure | Distributed persistent storage |
 | [CloudNativePG](platform/cloudnativepg/) | Platform | PostgreSQL operator |
 | [Grafana](platform/grafana/) | Platform | Metrics dashboards |
 | [Loki](platform/loki/) | Platform | Log aggregation |
 | [Forgejo](apps/forgejo/) | App | Self-hosted Git service |
 | [Orcamentos](apps/orcamentos/) | App | Budget management app |
-| [Tailscale](apps/tailscale/) | App | VPN mesh access |
-| [WireGuard](apps/wireguard/) | App | VPN |
+| [WireGuard](apps/wireguard/) | App | VPN — remote access to home network |
 | [DuckDNS](apps/duckdns/) | App | Dynamic DNS updater |
 
 ---
