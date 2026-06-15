@@ -89,7 +89,7 @@ The AMD64 machine also runs additional workloads outside the Kubernetes cluster 
 | [Grafana + Loki](https://grafana.com/) | Observability | Started running both outside Kubernetes in an Ubuntu Server VM to monitor Proxmox. Migrated into the cluster to keep all workloads managed by GitOps. Grafana is one of the main platform services — dashboard configurations are declared as code in the repository. Loki handles log aggregation for cluster and application logs. |
 | [WireGuard](https://www.wireguard.com/) | VPN | Used for remote access to the home network from outside — both personal use and for the company to access Nextcloud and internal apps. Simple, open source, and highly performant. Configuration is based on public/private key pairs, which makes it easy to understand and audit. |
 | [DuckDNS](https://www.duckdns.org/) | Dynamic DNS | My ISP provides a real public IP (no CGNAT) but it changes every time the modem reboots. DuckDNS keeps a domain always pointed to the current public IP. A Kubernetes CronJob runs every 5 minutes to update DuckDNS with the latest IP — used as the endpoint for WireGuard so remote clients can always connect regardless of IP changes. |
-| [Forgejo](https://forgejo.org/) | Git hosting | Self-hosted Git service used to back up all personal project repositories and collaborate with friends — sharing private repos, `.env` files, and project assets without depending on a third-party platform. Keeping data under my own control is a core motivation for the homelab. |
+| [Forgejo](https://forgejo.org/) | Git hosting + Container registry | Self-hosted Git service used to back up all personal project repositories and collaborate with friends. Also serves as a container registry — multi-arch images for personal projects are built and stored here, keeping the full image supply chain self-hosted. |
 
 ---
 
@@ -150,7 +150,7 @@ Every component has a `base/` with generic manifests and an `overlays/homelab/` 
 Flux Kustomizations use `dependsOn` to enforce reconciliation order. Apps only deploy after infrastructure and platform are healthy, preventing startup failures from missing dependencies.
 
 **Mixed architecture cluster**
-The cluster runs on both AMD64 (Proxmox VMs) and ARM64 (Raspberry Pi 5). All workloads use multi-arch container images to run on both node types.
+The cluster runs on both AMD64 (Proxmox VMs) and ARM64 (Raspberry Pi 5). All workloads use multi-arch container images to run on both node types. Container images for personal projects are built for both architectures and stored in the self-hosted Forgejo registry, keeping the full image supply chain under my own control.
 
 **Dedicated load balancer over CNI built-in**
 Cilium ships with its own load balancer (CiliumLB), but MetalLB was chosen as a separate, dedicated component. Keeping the load balancer independent makes it easier to reason about, troubleshoot, and replace without touching the CNI layer.
