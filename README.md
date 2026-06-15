@@ -199,12 +199,3 @@ High-level steps:
 5. Add the SOPS age private key as a Kubernetes secret
 6. Flux reconciles this repository and brings up the full stack
 
----
-
-## Roadmap
-
-- [ ] Add Prometheus for metrics collection
-- [ ] Set up Alertmanager for alerting
-- [ ] Implement automated backups for Longhorn volumes
-- [ ] Add staging overlay environment
-- [ ] Explore Renovate Bot for automated dependency updates
