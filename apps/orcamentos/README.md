@@ -1,6 +1,6 @@
 # orcamentos
 
-Application manifests for the `orcamentos` app.
+Business proposal generator for the company — used by partners to create and manage quotes.
 
 ## Layout
 

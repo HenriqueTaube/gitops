@@ -177,10 +177,12 @@ The home IP changes on every modem reboot (dynamic IP, no CGNAT). Rather than a 
 | [CloudNativePG](platform/cloudnativepg/) | Platform | PostgreSQL operator |
 | [Grafana](platform/grafana/) | Platform | Metrics dashboards |
 | [Loki](platform/loki/) | Platform | Log aggregation |
-| [Forgejo](apps/forgejo/) | App | Self-hosted Git service |
-| [Orcamentos](apps/orcamentos/) | App | Budget management app |
-| [WireGuard](apps/wireguard/) | App | VPN — remote access to home network |
-| [DuckDNS](apps/duckdns/) | App | Dynamic DNS updater |
+| [Forgejo](apps/forgejo/) | App | Self-hosted Git service + container registry |
+| [Agente Inglês](apps/agente-ingles/) | App | English conversation practice with AI API — live at [agente.taubekube.com](https://agente.taubekube.com) |
+| [Orçamentos](apps/orcamentos/) | App | Business proposal generator for company partners |
+| [PC-On](apps/pc-on/) | App | Remotely turns on desktop PC (Solidworks/AutoCAD) via Arduino |
+| [WireGuard](apps/wireguard/) | App | VPN — remote access to home network for personal and company use |
+| [DuckDNS](apps/duckdns/) | App | Dynamic DNS updater via Kubernetes CronJob |
 
 ---
 
