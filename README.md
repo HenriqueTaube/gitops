@@ -166,6 +166,9 @@ External access is handled without opening ports on the home network, using two 
 **Dynamic DNS as Kubernetes-native infrastructure**
 The home IP changes on every modem reboot (dynamic IP, no CGNAT). Rather than a script running on a VM, a Kubernetes CronJob updates DuckDNS every 5 minutes with the current public IP. This keeps the WireGuard endpoint always reachable and is managed entirely through GitOps like everything else in the cluster.
 
+**Longhorn for free pod scheduling across nodes**
+Early in the homelab, before adopting Longhorn, persistent storage was handled with plain Kubernetes PVs and PVCs — volume data only existed on the node where it was first created. This meant pods could not be scheduled freely: if Kubernetes placed a pod on a different node, it failed to mount its data. Rather than pinning pods to nodes with `nodeSelector`, the fix was adopting Longhorn and setting its replica count equal to the number of nodes (2 replicas for 2 nodes today). This replicates volume data to every node, letting pods schedule freely, with the extra replicas doubling as backup.
+
 ---
 
 ## Deployed Services
