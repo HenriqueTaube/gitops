@@ -1,6 +1,6 @@
 # metallb
 
-Bare-metal load balancer for the homelab cluster.
+Bare-metal load balancer for the homelab cluster. Runs in Layer2 mode, assigning real LAN IP addresses to `LoadBalancer` type services from a reserved address pool. Used by Forgejo, Grafana, Loki, WireGuard, and other services to get stable, fixed IPs on the local network without relying on NodePort.
 
 ## Why
 

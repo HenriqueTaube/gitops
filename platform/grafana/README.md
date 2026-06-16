@@ -1,6 +1,6 @@
 # grafana
 
-Metrics and log dashboards for the homelab cluster.
+Metrics and log dashboards for the homelab cluster. Monitors both Kubernetes workloads and the Proxmox hypervisor — external VMs ship logs via Alloy to Loki, which Grafana queries for visualization. Dashboard configurations are declared as code in this repository. Uses PostgreSQL via CloudNativePG as its database backend.
 
 ## Why
 

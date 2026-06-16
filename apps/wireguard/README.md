@@ -1,6 +1,6 @@
 # wireguard
 
-VPN for remote access to the home network.
+VPN for remote access to the home network. Runs plain WireGuard without a web UI, configured manually via config files. Uses `hostNetwork` and `NET_ADMIN` capability for low-level network access. Pinned to a specific node via `nodeAffinity` — VPN clients connect to a fixed IP and port, so the pod must always land on the same node. To add or change a peer, enter the pod via toolbox, edit the WireGuard config, and restart the pod.
 
 ## Why
 
