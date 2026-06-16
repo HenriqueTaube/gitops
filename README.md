@@ -90,6 +90,7 @@ The AMD64 machine also runs additional workloads outside the Kubernetes cluster 
 | [WireGuard](https://www.wireguard.com/) | VPN | Used for remote access to the home network from outside — both personal use and for the company to access Nextcloud and internal apps. Simple, open source, and highly performant. Configuration is based on public/private key pairs, which makes it easy to understand and audit. |
 | [DuckDNS](https://www.duckdns.org/) | Dynamic DNS | My ISP provides a real public IP (no CGNAT) but it changes every time the modem reboots. DuckDNS keeps a domain always pointed to the current public IP. A Kubernetes CronJob runs every 5 minutes to update DuckDNS with the latest IP — used as the endpoint for WireGuard so remote clients can always connect regardless of IP changes. |
 | [Forgejo](https://forgejo.org/) | Git hosting + Container registry | Self-hosted Git service used to back up all personal project repositories and collaborate with friends. Also serves as a container registry — multi-arch images for personal projects are built and stored here, keeping the full image supply chain self-hosted. |
+| [k9s](https://k9scli.io/) | Cluster management | Terminal UI for managing all kinds of Kubernetes resources — pods, deployments, PVCs, PVs, services, logs, and more. Chosen for being a CLI-only tool, fitting a terminal-first workflow — runs in its own dedicated tmux window. |
 
 ---
 
