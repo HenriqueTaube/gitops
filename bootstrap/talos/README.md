@@ -58,7 +58,9 @@ kubectl get nodes -o wide
 
 ## Step 5 — Upgrade workers to the custom image
 
-**Important:** Longhorn requires `iscsi-tools` and `util-linux-tools` baked into the node image. The workers **must** run the custom image from the Image Factory — the default Talos image will not work with Longhorn.
+**Only required if the machine config files (`worker-prox.yaml` / `worker-rasp.yaml`) do not already have `machine.install.image` pointing to the custom Image Factory image.** If the configs already reference the custom image, applying them in Step 1 is enough — skip this step.
+
+**Why this matters:** Longhorn requires `iscsi-tools` and `util-linux-tools` baked into the node image. The workers **must** run the custom image from the Image Factory — the default Talos image will not work with Longhorn.
 
 The schematic is defined in `factory/talos-schematic.yaml`. The resulting image is:
 
