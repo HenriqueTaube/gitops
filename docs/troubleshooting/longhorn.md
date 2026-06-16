@@ -41,10 +41,6 @@ kubectl -n longhorn-system rollout restart deployment/longhorn-driver-deployer
 kubectl -n longhorn-system rollout restart deployment/longhorn-ui
 ```
 
-### Lesson
-
-Always label `longhorn-system` as privileged before applying Longhorn manifests, otherwise the manager fails to start.
-
 ---
 
 ## Incident 2: Volumes stuck in Degraded — wrong replica count

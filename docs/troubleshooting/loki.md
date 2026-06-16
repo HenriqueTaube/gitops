@@ -14,7 +14,11 @@ Storage was kept on NFS during the migration (`192.168.1.224:/srv/backup/nfs/lok
 
 ## Incident 1: External VMs couldn't reach Loki via NodePort on worker-rasp
 
-### Setup
+### Context
+
+During the initial migration, Loki was deployed with a `NodePort` service on port `31010`. Loki now uses a `LoadBalancer` service via MetalLB — this incident happened before that change.
+
+### Setup at the time
 
 Loki was deployed with a `NodePort` service on port `31010`. External VMs (like the Bitcoin node) use `alloy` to push logs to Loki.
 
@@ -32,23 +36,19 @@ The Alloy agent on external VMs could not push logs when configured to use the `
 
 Even though the pod was running on `worker-rasp`, the `NodePort` on that node was not responding reliably to external traffic. The same port on `worker-prox` responded correctly.
 
-### Fix
+### Temporary fix
 
-Configure all external Alloy agents to use the `worker-prox` IP as the Loki endpoint:
+Configured all external Alloy agents to use the `worker-prox` IP as the Loki endpoint:
 
 ```
 http://192.168.1.152:31010/loki/api/v1/push
 ```
 
-For internal cluster traffic (e.g. Grafana datasource), use the in-cluster DNS name:
-
-```
-http://loki.loki.svc.cluster.local:3100
-```
+The final fix was migrating the service to `LoadBalancer` via MetalLB, giving Loki a stable IP independent of which node the pod runs on.
 
 ### Lesson
 
-**A `NodePort` is accessible on all nodes, but in practice it may not respond reliably on every node for external traffic.** When a NodePort is not reachable on one node, try another node's IP before debugging further — the pod does not need to be on the node you connect to.
+**A `NodePort` is accessible on all nodes, but in practice it may not respond reliably on every node for external traffic.** A `LoadBalancer` service via MetalLB is the better solution for bare-metal clusters — it provides a stable IP regardless of pod placement.
 
 ---
 
