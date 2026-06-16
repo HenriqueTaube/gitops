@@ -19,7 +19,7 @@ The migration happened in stages, each with its own incidents.
 
 ### Key gotcha: use the official image, not the self-hosted registry
 
-During migration, the Forgejo container image was intentionally pulled from `codeberg.org/forgejo/forgejo:14.0` instead of the self-hosted Forgejo registry. This avoids a chicken-and-egg problem: if the registry is the same instance being migrated, it may be unavailable during the migration window.
+During migration, the Forgejo container image was intentionally pulled from `codeberg.org/forgejo/forgejo:14.0` instead of the self-hosted Forgejo registry. This avoids a dependency loop: if the only registry is the same Forgejo instance being migrated, it may be unavailable during the migration window — you can't pull from a service you haven't brought up yet.
 
 ### Incident: nested data directory after tar restore
 
@@ -62,13 +62,16 @@ The VM used MariaDB, which created tables with collation `utf8mb4_uca1400_as_cs`
 
 ## Stage 2: local-path → NFS
 
+At this point, Longhorn was not yet installed in the cluster. NFS was used as the PVC storage backend — the goal was to move Forgejo's persistent data off local-path storage and onto NFS-backed PVCs, which also served as the backup location.
+
 ### Migration flow
 
 1. Copy app data from the local PVC to the NFS path: `/srv/backup/nfs/forgejo`
-2. Dump the MariaDB database with `mariadb-dump`
-3. Import the dump into the new MariaDB instance pointing to the NFS PVC
-4. Update the `forgejo-app-ini` Secret with the new paths
-5. Restart the Forgejo deployment
+2. Create new PVCs backed by NFS (app data and MySQL)
+3. Dump the MariaDB database with `mariadb-dump`
+4. Import the dump into the new MariaDB instance pointing to the NFS PVC
+5. Update the `forgejo-app-ini` Secret with the new paths
+6. Restart the Forgejo deployment
 
 ---
 
@@ -129,39 +132,3 @@ During the NFS → Longhorn migration, the Longhorn StorageClass still had 3 rep
 **Fix:** use the custom `longhorn-2` StorageClass (2 replicas) for all Forgejo PVCs. See [longhorn.md](longhorn.md) for details.
 
 ---
-
-## Incident: docker buildx failing to push to Forgejo registry
-
-### Symptom
-
-After Forgejo was placed behind Traefik with a local hostname (`forgejo.home.arpa`), `docker buildx` failed with:
-
-```
-lookup forgejo.home.arpa on 192.168.1.233:53: no such host
-```
-
-Browser access worked fine (via `/etc/hosts`), but `docker buildx` runs in a container and consults the network DNS, not `/etc/hosts` on the host machine.
-
-### Fix
-
-**Step 1** — Add a Local DNS Record in Pi-hole pointing `forgejo.home.arpa` to the Traefik LoadBalancer IP.
-
-**Step 2** — Recreate the buildx builder to pick up the new DNS:
-
-```bash
-sudo docker buildx rm mybuilder
-sudo docker buildx create --name mybuilder --use
-sudo docker buildx inspect --bootstrap
-```
-
-**Step 3** — Validate DNS resolution:
-
-```bash
-dig @192.168.1.233 forgejo.home.arpa
-# or
-getent hosts forgejo.home.arpa
-```
-
-### Lesson
-
-**Tools running inside containers (like `docker buildx`) use network DNS, not `/etc/hosts`.** If a service is behind a local hostname, that hostname must exist in the network DNS server (Pi-hole in this case), not just in the local machine's hosts file.
