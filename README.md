@@ -212,16 +212,10 @@ bash bootstrap/kubernetes/bootstrap-flux-pre.sh
 ```
 Creates the `flux-system` namespace, installs the SOPS age secret, and runs `flux bootstrap github`. Flux then reconciles the full stack automatically: `infrastructure` → `platform` → `apps`. See [bootstrap/kubernetes/README.md](bootstrap/kubernetes/README.md).
 
-**3. Image registry** — since some apps use images from the self-hosted Forgejo registry, which is not available on a fresh cluster, run:
-```bash
-bash bootstrap/kubernetes/bootstrap-github.sh
-```
-Switches those images to GitHub Container Registry (`ghcr.io`) and suspends Flux so it doesn't revert the changes.
+**3. Restore volumes** — open the Longhorn UI, configure the NFS backup target (`nfs://192.168.1.224:/srv/backup/nfs`), go to **Backup** and restore the Forgejo and Forgejo DB volumes. Wait for Forgejo to be healthy and serving the private registry.
 
-**4. Restore volumes** — open the Longhorn UI, configure the NFS backup target, go to **Backup** and restore the Forgejo and Forgejo DB volumes. Wait for Forgejo to be healthy and serving the private registry.
-
-**5. Resume Flux** — after Forgejo is healthy:
-```bash
-flux resume kustomization apps
-```
+> **If Forgejo is not available yet** — run `bootstrap/kubernetes/bootstrap-github.sh` first to switch private images to `ghcr.io` and suspend Flux while volumes are being restored. After Forgejo is healthy, resume Flux:
+> ```bash
+> flux resume kustomization apps
+> ```
 
