@@ -198,14 +198,26 @@ Early in the homelab, before adopting Longhorn, persistent storage was handled w
 
 ## Bootstrap
 
-> Full bootstrap steps are documented in [bootstrap/talos/README.md](bootstrap/talos/README.md).
+Full runbook to rebuild the cluster from scratch. Automated scripts are in `bootstrap/`.
 
-High-level steps:
+**1. Talos** — fill in node IPs at the top of the script and run:
+```bash
+bash bootstrap/talos/bootstrap-talos.sh
+```
+Applies machine configs with health checks, bootstraps the cluster, and upgrades workers to the custom image with Longhorn extensions. See [bootstrap/talos/README.md](bootstrap/talos/README.md).
 
-1. Generate Talos machine configs with `talosctl`
-2. Apply configs to controlplane and worker nodes
-3. Bootstrap the Kubernetes cluster
-4. Install Flux CD into the cluster with Helm
-5. Add the SOPS age private key as a Kubernetes secret
-6. Flux reconciles this repository and brings up the full stack
+**2. Kubernetes** — fill in `GITHUB_TOKEN` at the top and run:
+```bash
+bash bootstrap/kubernetes/bootstrap-flux-pre.sh
+```
+Creates the `flux-system` namespace, installs the SOPS age secret, and runs `flux bootstrap github`. Flux then reconciles the full stack automatically: `infrastructure` → `platform` → `apps`. See [bootstrap/kubernetes/README.md](bootstrap/kubernetes/README.md).
+
+**3. Image registry** — since some apps use images from the self-hosted Forgejo registry, which is not available on a fresh cluster, run:
+```bash
+bash bootstrap/kubernetes/bootstrap-github.sh
+```
+Switches those images to GitHub Container Registry (`ghcr.io`) and suspends Flux so it doesn't revert the changes. After restoring Forgejo volumes manually via the Longhorn UI, resume Flux:
+```bash
+flux resume kustomization apps
+```
 

@@ -2,10 +2,21 @@
 
 Talos bootstrap files and runbook for the homelab cluster.
 
+## Quick start
+
+Fill in the IPs at the top of the script and run:
+
+```bash
+bash bootstrap/talos/bootstrap-talos.sh
+```
+
+This applies all machine configs with health checks between each node, bootstraps the cluster, and upgrades workers to the custom Image Factory image with `iscsi-tools` + `util-linux-tools` for Longhorn.
+
 ## Contents
 
 - `clusterconfig/`: generated Talos machine configs (gitignored — contains cluster secrets, keep locally)
 - `factory/`: Talos Image Factory schematic and custom image reference
+- `bootstrap-talos.sh`: automated bootstrap script
 
 ---
 
