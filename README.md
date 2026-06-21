@@ -219,3 +219,5 @@ Creates the `flux-system` namespace, installs the SOPS age secret, and runs `flu
 > flux resume kustomization apps
 > ```
 
+**4. Verify** — open k9s and check all pods are running across all namespaces. Confirm deployments, PVCs, and services are healthy before considering the cluster ready.
+
