@@ -26,11 +26,28 @@ Fill in `GITHUB_TOKEN` at the top and run:
 bash bootstrap/kubernetes/bootstrap-github.sh
 ```
 
-Switches all private images to `ghcr.io` and suspends Flux reconciliation so it doesn't revert the changes. After Forgejo is healthy, restore volumes from the Longhorn UI then resume Flux:
+Switches all private images to `ghcr.io` and suspends Flux reconciliation so it doesn't revert the changes.
+
+While Flux apps are suspended, Longhorn is already running (reconciled by the infrastructure layer). This is the right moment to restore volumes from backup — before Flux resumes and creates empty PVCs for the apps.
+
+**Restoring Longhorn volumes from NFS backup:**
+
+1. Open the Longhorn UI
+2. Configure the NFS backup target: `nfs://192.168.1.224:/srv/backup/nfs`
+3. Go to **Backup** → find the volume you want to restore
+4. Click **Restore** — when prompted, set the PVC name to exactly match what the app expects (e.g. `forgejo-data`, `forgejo-db-data`)
+5. Longhorn creates the volume with backup data and a PVC bound to it
+6. Repeat for each volume that needs restoring
+
+> The PVC name during restore must match exactly what the app deployment expects. If Flux has already created an empty PVC with that name, delete it first so Longhorn can create it with the restored data.
+
+After all volumes are restored and Forgejo is healthy:
 
 ```bash
 flux resume kustomization apps
 ```
+
+Flux sees the PVCs already exist and binds the apps to the restored data.
 
 ---
 
