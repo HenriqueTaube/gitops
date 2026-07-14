@@ -10,3 +10,7 @@ spec:
         - name: wireguard
           image: 192.168.1.191:3000/henrique/wireguard:multi
           imagePullPolicy: Always
+      volumes:
+        - name: wireguard-data
+          persistentVolumeClaim:
+            claimName: wireguard-longhorn

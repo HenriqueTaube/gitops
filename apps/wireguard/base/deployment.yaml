@@ -47,7 +47,3 @@ spec:
           volumeMounts:
             - name: wireguard-data
               mountPath: /etc/wireguard
-      volumes:
-        - name: wireguard-data
-          persistentVolumeClaim:
-            claimName: wireguard-data
