@@ -7,7 +7,7 @@ spec:
   template:
     spec:
       nodeSelector:
-      kubernetes.io/hostname: worker-prox
+        kubernetes.io/hostname: worker-prox
       containers:
         - name: wireguard
           image: 192.168.1.191:3000/henrique/wireguard:multi
