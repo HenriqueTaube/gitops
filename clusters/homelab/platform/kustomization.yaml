@@ -5,3 +5,4 @@ resources:
   - ../../../platform/forgejo-db/overlays/homelab
   - ../../../platform/grafana/overlays/homelab
   - ../../../platform/loki/overlays/homelab
+  - ../../../platform/mempool-db/overlays/homelab
