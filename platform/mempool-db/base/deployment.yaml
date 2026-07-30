@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mempool-mysql
+  namespace: mempool
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mempool-mysql
+  template:
+    metadata:
+      labels:
+        app: mempool-mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mariadb:11.6
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: MARIADB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mempool-mysql
+                  key: mysql-root-password
+            - name: MARIADB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mempool-mysql
+                  key: mysql-database
+            - name: MARIADB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mempool-mysql
+                  key: mysql-user
+            - name: MARIADB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mempool-mysql
+                  key: mysql-password
+          ports:
+            - name: mysql
+              containerPort: 3306
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: mempool-mysql-longhorn

@@ -1,0 +1,10 @@
+ApiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mempool-mysql-longhorn
+  namespace: mempool
+spec:
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 10Gi
