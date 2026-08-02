@@ -5,8 +5,8 @@ resources:
   - namespace.yaml
   - service-knots.yaml
   - endpoints-knots.yaml
-  - secret-backend.yaml
-  - deployment-backend.yaml
-  - service-backend.yaml
-  - deployment-frontend.yaml
-  - service-frontend.yaml
+  - backend-secret.yaml
+  - backend-deployment.yaml
+  - backend-service.yaml
+  - frontend-deployment.yaml
+  - frontend-service.yaml
