@@ -66,8 +66,9 @@ The AMD64 machine also runs additional workloads outside the Kubernetes cluster 
        MetalLB            Grafana           Forgejo
        Longhorn           Loki              Orcamentos
        Cilium             CloudNativePG     WireGuard
-                                            DuckDNS
-                                            Cloudflare Tunnel
+                          Forgejo-DB        DuckDNS
+                          Mempool-DB        Cloudflare Tunnel
+                                            Mempool
 ```
 
 ---
@@ -116,13 +117,15 @@ gitops/
 │   ├── cloudnativepg/
 │   ├── grafana/
 │   ├── loki/
-│   └── forgejo-db/
+│   ├── forgejo-db/
+│   └── mempool-db/
 └── apps/                   # Applications running on the cluster
     ├── forgejo/
     ├── orcamentos/
     ├── tailscale/
     ├── wireguard/
     ├── duckdns/
+    ├── mempool/
     └── ...
 ```
 
@@ -193,6 +196,7 @@ Early in the homelab, before adopting Longhorn, persistent storage was handled w
 | [PC-On](apps/pc-on/) | App | Remotely turns on desktop PC (Solidworks/AutoCAD/Windows 11) via Arduino |
 | [WireGuard](apps/wireguard/) | App | VPN — remote access to home network for personal and company use |
 | [DuckDNS](apps/duckdns/) | App | Dynamic DNS updater via Kubernetes CronJob |
+| [Mempool](apps/mempool/) | App | Self-hosted Bitcoin block explorer against my own node — avoids leaking wallet lookups/IP to a third-party explorer |
 
 ---
 
