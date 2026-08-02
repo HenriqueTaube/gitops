@@ -6,3 +6,4 @@ resources:
   - ../../../apps/forgejo/overlays/homelab
   - ../../../apps/orcamentos/overlays/homelab
   - ../../../apps/wireguard/overlays/homelab
+  - ../../../apps/mempool/overlays/homelab
