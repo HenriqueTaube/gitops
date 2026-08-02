@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mempool-frontend
+  namespace: mempool
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mempool-frontend
+  template:
+    metadata:
+      labels:
+        app: mempool-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: 192.168.1.191:3000/henrique/mempool-frontend:v3.3.1
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: BACKEND_MAINNET_HTTP_HOST
+              value: "mempool-backend"
+            - name: BACKEND_MAINNET_HTTP_PORT
+              value: "8999"
+          ports:
+            - name: http
+              containerPort: 8080

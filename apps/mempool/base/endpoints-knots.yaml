@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: knots
+  namespace: mempool
+subsets:
+  - addresses:
+      - ip: 192.168.1.151
+    ports:
+      - name: rpc
+        port: 8332
+      - name: electrum
+        port: 50001

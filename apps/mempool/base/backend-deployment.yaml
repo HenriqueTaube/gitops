@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mempool-backend
+  namespace: mempool
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mempool-backend
+  template:
+    metadata:
+      labels:
+        app: mempool-backend
+    spec:
+      containers:
+        - name: backend
+          image: 192.168.1.191:3000/henrique/mempool-backend:v3.3.1
+          imagePullPolicy: IfNotPresent
+          command:
+            [
+              "./wait-for-it.sh",
+              "mempool-mysql:3306",
+              "--timeout=720",
+              "--strict",
+              "--",
+              "./start.sh",
+            ]
+          env:
+            - name: MEMPOOL_BACKEND
+              value: "electrum"
+            - name: CORE_RPC_HOST
+              value: "knots"
+            - name: CORE_RPC_PORT
+              value: "8332"
+            - name: CORE_RPC_USERNAME
+              value: "mempool"
+            - name: CORE_RPC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mempool-backend
+                  key: core-rpc-password
+            - name: ELECTRUM_HOST
+              value: "knots"
+            - name: ELECTRUM_PORT
+              value: "50001"
+            - name: ELECTRUM_TLS_ENABLED
+              value: "false"
+            - name: DATABASE_ENABLED
+              value: "true"
+            - name: DATABASE_HOST
+              value: "mempool-mysql"
+            - name: DATABASE_PORT
+              value: "3306"
+            - name: DATABASE_DATABASE
+              value: "mempool"
+            - name: DATABASE_USERNAME
+              value: "mempool"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mempool-backend
+                  key: database-password
+          ports:
+            - name: http
+              containerPort: 8999
