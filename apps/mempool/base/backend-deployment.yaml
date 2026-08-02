@@ -13,6 +13,8 @@ spec:
       labels:
         app: mempool-backend
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: worker-rasp
       containers:
         - name: backend
           image: 192.168.1.191:3000/henrique/mempool-backend:v3.3.1

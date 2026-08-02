@@ -13,6 +13,8 @@ spec:
       labels:
         app: mempool-frontend
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: worker-rasp
       containers:
         - name: frontend
           image: 192.168.1.191:3000/henrique/mempool-frontend:v3.3.1
