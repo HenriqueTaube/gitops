@@ -191,7 +191,6 @@ Early in the homelab, before adopting Longhorn, persistent storage was handled w
 | [Grafana](platform/grafana/) | Platform | Metrics dashboards |
 | [Loki](platform/loki/) | Platform | Log aggregation |
 | [Forgejo](apps/forgejo/) | App | Self-hosted Git service + container registry |
-| [Agente Inglês](apps/agente-ingles/) | App | English conversation practice with AI API — live at [agente.taubekube.com](https://agente.taubekube.com) |
 | [Orçamentos](apps/orcamentos/) | App | Business proposal generator for company partners |
 | [PC-On](apps/pc-on/) | App | Remotely turns on desktop PC (Solidworks/AutoCAD/Windows 11) via Arduino |
 | [WireGuard](apps/wireguard/) | App | VPN — remote access to home network for personal and company use |
