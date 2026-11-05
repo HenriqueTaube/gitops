@@ -1,5 +1,7 @@
 # pc-on
 
+> **Not in use** — this folder is not listed in `clusters/homelab/`, so Flux does not deploy it. Kept for reference.
+
 Application for remotely turning on the desktop PC via an Arduino.
 
 ## Why

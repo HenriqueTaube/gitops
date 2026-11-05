@@ -67,8 +67,7 @@ The AMD64 machine also runs additional workloads outside the Kubernetes cluster 
        Longhorn           Loki              Orcamentos
        Cilium             CloudNativePG     WireGuard
                           Forgejo-DB        DuckDNS
-                          Mempool-DB        Cloudflare Tunnel
-                                            Mempool
+                          Mempool-DB        Mempool
 ```
 
 ---
@@ -84,7 +83,6 @@ The AMD64 machine also runs additional workloads outside the Kubernetes cluster 
 | [SOPS + age](https://github.com/getsops/sops) | Secrets management | Native Flux CD support makes integration straightforward. Only the secret values are encrypted — the YAML structure stays readable in Git. age keys were chosen for their simplicity over PGP. |
 | [Cilium](https://cilium.io/) | CNI | Started with Flannel but had compatibility problems with the Raspberry Pi nodes. Migrated to Cilium, which handled the mixed AMD64/ARM64 cluster without issues. Also the most widely adopted CNI in the industry. |
 | [MetalLB](https://metallb.universe.tf/) | Load balancer | The cluster uses Cilium as the CNI, which includes its own load balancer (CiliumLB). MetalLB was chosen anyway to keep the load balancer as a dedicated, separate component — easier to reason about and troubleshoot independently. Simple Helm installation, almost plug and play for bare-metal. |
-| [Cloudflare Tunnel](https://www.cloudflare.com/products/tunnel/) | External access for Apps| Exposes applications publicly without opening ports on the home network. Creates an outbound connection from the cluster to Cloudflare, making apps accessible at a public domain (e.g. [agente.taubekube.com](https://agente.taubekube.com)) with automatic HTTPS. |
 | [Longhorn](https://longhorn.io/) | Persistent storage | Chosen for its built-in snapshot and backup support, agent-per-node architecture, and NFS export capability used for backups. Volumes are automatically distributed and replicated across nodes. Almost plug and play to install — no complex storage backend required. |
 | [CloudNativePG](https://cloudnative-pg.io/) | PostgreSQL operator | Used to run the PostgreSQL database for Grafana. Manages PostgreSQL as a Kubernetes-native resource — the database runs in a dedicated pod with its own persistent volume. If the pod is deleted, Kubernetes recreates it automatically with the same data. Configuration is declared in YAML and immutable, which fits the GitOps model. |
 | [Grafana + Loki](https://grafana.com/) | Observability | Started running both outside Kubernetes in an Ubuntu Server VM to monitor Proxmox. Migrated into the cluster to keep all workloads managed by GitOps. Grafana is one of the main platform services — dashboard configurations are declared as code in the repository. Loki handles log aggregation for cluster and application logs. |
@@ -109,12 +107,10 @@ gitops/
 │       ├── infrastructure.yaml
 │       ├── platform.yaml
 │       └── apps.yaml
-├── infrastructure/         # Cluster infrastructure (networking, storage, ingress)
+├── infrastructure/         # Cluster infrastructure (load balancing, storage)
 │   ├── metallb/
-│   ├── traefik/
 │   └── longhorn/
 ├── platform/               # Shared platform services (databases, observability)
-│   ├── cloudnativepg/
 │   ├── grafana/
 │   ├── loki/
 │   ├── forgejo-db/
@@ -122,11 +118,10 @@ gitops/
 └── apps/                   # Applications running on the cluster
     ├── forgejo/
     ├── orcamentos/
-    ├── tailscale/
     ├── wireguard/
     ├── duckdns/
     ├── mempool/
-    └── ...
+    └── ...             # Not in use — see "Not in Use" below
 ```
 
 Each component follows the same layout:
@@ -164,7 +159,7 @@ The cluster started with Flannel as the CNI, which worked on AMD64 but caused co
 
 **No open ports — two strategies for external access**
 External access is handled without opening ports on the home network, using two different approaches depending on the use case:
-- **Cloudflare Tunnel** — for public-facing apps accessible via a domain (e.g. [agente.taubekube.com](https://agente.taubekube.com)). Cloudflare acts as a secure proxy with automatic HTTPS.
+- **Cloudflare Tunnel** — was used for public-facing apps accessible via a domain, with Cloudflare acting as a secure proxy with automatic HTTPS. No longer in use; manifests kept in [apps/cloudflare](apps/cloudflare/).
 - **WireGuard VPN** — for trusted company partners who need private access to internal applications and Nextcloud. VPN access is highly secure and grants network-level access only to authorized peers via public/private key authentication.
 
 **Dynamic DNS as Kubernetes-native infrastructure**
@@ -187,15 +182,30 @@ Early in the homelab, before adopting Longhorn, persistent storage was handled w
 |---|---|---|
 | [MetalLB](infrastructure/metallb/) | Infrastructure | Bare-metal load balancer |
 | [Longhorn](infrastructure/longhorn/) | Infrastructure | Distributed persistent storage |
-| [CloudNativePG](platform/cloudnativepg/) | Platform | PostgreSQL operator |
+| CloudNativePG | Platform | PostgreSQL operator — runs the Grafana database |
 | [Grafana](platform/grafana/) | Platform | Metrics dashboards |
 | [Loki](platform/loki/) | Platform | Log aggregation |
 | [Forgejo](apps/forgejo/) | App | Self-hosted Git service + container registry |
 | [Orçamentos](apps/orcamentos/) | App | Business proposal generator for company partners |
-| [PC-On](apps/pc-on/) | App | Remotely turns on desktop PC (Solidworks/AutoCAD/Windows 11) via Arduino |
 | [WireGuard](apps/wireguard/) | App | VPN — remote access to home network for personal and company use |
 | [DuckDNS](apps/duckdns/) | App | Dynamic DNS updater via Kubernetes CronJob |
 | [Mempool](apps/mempool/) | App | Self-hosted Bitcoin block explorer against my own node — avoids leaking wallet lookups/IP to a third-party explorer |
+
+### Not in Use
+
+These folders are kept in the repository for reference but are **not deployed** — they are not listed in `clusters/homelab/`, so Flux ignores them.
+
+| Folder | Description |
+|---|---|
+| [infrastructure/traefik](infrastructure/traefik/) | Ingress controller |
+| [platform/cloudnativepg](platform/cloudnativepg/) | Test PostgreSQL cluster (`pg-lab`) |
+| [apps/agente-ingles](apps/agente-ingles/) | English conversation practice app |
+| [apps/cloudflare](apps/cloudflare/) | Cloudflare Tunnel for public access |
+| [apps/tailscale](apps/tailscale/) | Tailscale operator and app exposure |
+| [apps/codex](apps/codex/) | Codex API app |
+| [apps/pc-on](apps/pc-on/) | Remotely turns on desktop PC via Arduino |
+| [apps/toolbox](apps/toolbox/) | Debug pods for Talos nodes |
+| [apps/wireguard-easy](apps/wireguard-easy/) | WireGuard with web UI |
 
 ---
 
@@ -211,13 +221,13 @@ Applies machine configs with health checks, bootstraps the cluster, and upgrades
 
 **2. Kubernetes** — fill in `GITHUB_TOKEN` at the top and run:
 ```bash
-bash bootstrap/kubernetes/bootstrap-flux-pre.sh
+bash bootstrap/kubernetes/bootstrap-flux.sh
 ```
 Creates the `flux-system` namespace, installs the SOPS age secret, and runs `flux bootstrap github`. Flux then reconciles the full stack automatically: `infrastructure` → `platform` → `apps`. See [bootstrap/kubernetes/README.md](bootstrap/kubernetes/README.md).
 
 **3. Restore volumes** — open the Longhorn UI, configure the NFS backup target (`nfs://192.168.1.224:/srv/backup/nfs`), go to **Backup** and restore the Forgejo and Forgejo DB volumes. Wait for Forgejo to be healthy and serving the private registry.
 
-> **If Forgejo is not available yet** — run `bootstrap/kubernetes/bootstrap-github.sh` first to switch private images to `ghcr.io` and suspend Flux while volumes are being restored. After Forgejo is healthy, resume Flux:
+> **If Forgejo is not available yet** — run `bootstrap/kubernetes/bootstrap-github-images.sh` first to switch private images to `ghcr.io` and suspend Flux while volumes are being restored. After Forgejo is healthy, resume Flux:
 > ```bash
 > flux resume kustomization apps
 > ```
