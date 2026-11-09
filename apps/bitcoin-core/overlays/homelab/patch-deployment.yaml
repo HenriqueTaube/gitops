@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bitcoin-core
+  namespace: bitcoin-core
+spec:
+  template:
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: worker-prox
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        fsGroup: 101
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: bitcoind
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: bitcoin-data
+          persistentVolumeClaim:
+            claimName: bitcoin-core-data
+        - name: bitcoin-config
+          configMap:
+            name: bitcoin-core-config
+        - name: bitcoin-secret
+          secret:
+            secretName: bitcoin-core-rpcauth

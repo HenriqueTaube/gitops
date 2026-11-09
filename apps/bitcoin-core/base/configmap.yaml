@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bitcoin-core-config
+  namespace: bitcoin-core
+data:
+  bitcoin.conf: |
+    # Bitcoin Core 29.x — mainnet full node (unpruned)
+    server=1
+    printtoconsole=1
+    # Logs go to stdout -> Alloy -> Loki; no debug.log growing on the volume
+    nodebuglogfile=1
+    disablewallet=1
+
+    # Policy: keep the 83-byte OP_RETURN relay limit (already the v29 default,
+    # set explicitly so it survives a bump to v30+, where the default became 100000)
+    datacarrier=1
+    datacarriersize=83
+
+    # Resources
+    # IBD: dbcache=3000 (deployment memory 4Gi request / 5Gi limit).
+    # After sync: dbcache=1000 and memory 2Gi / 4Gi to give RAM back to worker-prox.
+    dbcache=3000
+    maxmempool=300
+    maxconnections=40
+
+    # RPC: reachable only from inside the cluster (pod CIDR) through the ClusterIP Service
+    rpcbind=0.0.0.0
+    rpcallowip=127.0.0.1
+    rpcallowip=10.0.0.0/8
+
+    # rpcauth= lines (SOPS secret, mounted by the overlay)
+    includeconf=/etc/bitcoin-secret/rpcauth.conf

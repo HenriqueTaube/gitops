@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bitcoin-core
+  namespace: bitcoin-core
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: bitcoin-core
+  template:
+    metadata:
+      labels:
+        app: bitcoin-core
+    spec:
+      terminationGracePeriodSeconds: 300
+      containers:
+        - name: bitcoind
+          image: bitcoin/bitcoin:29.5
+          imagePullPolicy: IfNotPresent
+          command:
+            - bitcoind
+          args:
+            - -conf=/etc/bitcoin/bitcoin.conf
+            - -datadir=/home/bitcoin/.bitcoin
+          ports:
+            - name: rpc
+              containerPort: 8332
+            - name: p2p
+              containerPort: 8333
+          startupProbe:
+            tcpSocket:
+              port: rpc
+            periodSeconds: 10
+            failureThreshold: 60
+          livenessProbe:
+            tcpSocket:
+              port: rpc
+            periodSeconds: 30
+            failureThreshold: 5
+          readinessProbe:
+            tcpSocket:
+              port: rpc
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 500m
+              memory: 4Gi
+            limits:
+              memory: 5Gi
+          volumeMounts:
+            - name: bitcoin-data
+              mountPath: /home/bitcoin/.bitcoin
+            - name: bitcoin-config
+              mountPath: /etc/bitcoin
+              readOnly: true
+            - name: bitcoin-secret
+              mountPath: /etc/bitcoin-secret
+              readOnly: true

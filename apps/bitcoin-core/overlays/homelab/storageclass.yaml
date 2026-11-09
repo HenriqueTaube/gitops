@@ -1,0 +1,18 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-bitcoin
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+parameters:
+  dataEngine: v1
+  numberOfReplicas: "1"
+  dataLocality: strict-local
+  diskSelector: "bitcoin"
+  disableRevisionCounter: "true"
+  fsType: ext4
+  mkfsParams: "-m 0"
+  staleReplicaTimeout: "30"
+  unmapMarkSnapChainRemoved: ignored
