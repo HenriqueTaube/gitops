@@ -29,5 +29,5 @@ data:
     rpcallowip=127.0.0.1
     rpcallowip=10.0.0.0/8
 
-    # rpcauth= lines (SOPS secret, mounted by the overlay)
+    # RPC credentials: rpcuser= / rpcpassword= (SOPS secret, mounted by the overlay)
     includeconf=/etc/bitcoin-secret/rpcauth.conf
