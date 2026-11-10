@@ -20,7 +20,7 @@ data:
     # Resources
     # IBD: dbcache=3000 (deployment memory 4Gi request / 5Gi limit).
     # After sync: dbcache=1000 and memory 2Gi / 4Gi to give RAM back to worker-prox.
-    dbcache=3000
+    dbcache=1500
     maxmempool=300
     maxconnections=40
 

@@ -7,4 +7,4 @@ resources:
   - ../../../apps/orcamentos/overlays/homelab
   - ../../../apps/wireguard/overlays/homelab
   - ../../../apps/mempool/overlays/homelab
-##  - ../../../apps/bitcoin-core/overlays/homelab
+  - ../../../apps/bitcoin-core/overlays/homelab
