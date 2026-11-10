@@ -5,3 +5,4 @@ metadata:
   namespace: bitcoin-core
 spec:
   storageClassName: longhorn-bitcoin
+  volumeName: pvc-864ed79b-987f-4ce2-afa8-911a12e480f5
